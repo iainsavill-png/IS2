@@ -229,7 +229,8 @@ private fun StationField(
     var focused by remember { mutableStateOf(false) }
     val focus = LocalFocusManager.current
     val suggestions = remember(value) {
-        if (value.endsWith(")")) emptyList() else Stations.search(value)
+        // A picked station is shown as "Name (CRS)"; don't offer suggestions for it again.
+        if (PICKED_LABEL.containsMatchIn(value)) emptyList() else Stations.search(value)
     }
     Column(modifier) {
         OutlinedTextField(
@@ -456,10 +457,12 @@ private fun SettingsDialog(
 
 private fun labelFor(crs: String): String = Stations.nameFor(crs)?.let { "$it ($crs)" } ?: crs.uppercase()
 
+private val PICKED_LABEL = Regex("""\(([A-Za-z]{3})\)$""")
+
 /** Accepts "Name (CRS)", a bare CRS code, or a station name/prefix from the built-in list. */
 private fun resolveCrs(input: String): String? {
     val s = input.trim()
-    Regex("""\(([A-Za-z]{3})\)$""").find(s)?.let { return it.groupValues[1].uppercase() }
+    PICKED_LABEL.find(s)?.let { return it.groupValues[1].uppercase() }
     if (Stations.isCrs(s)) return s.uppercase()
     return Stations.search(s, limit = 1).firstOrNull()?.crs
 }

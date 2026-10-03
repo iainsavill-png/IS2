@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 import uk.railboard.app.data.LdbwsClient
 import uk.railboard.app.data.Settings
 import uk.railboard.app.data.StationBoard
+import uk.railboard.app.data.Stations
 
 data class UiState(
     val crs: String? = null,
@@ -40,6 +42,11 @@ class DeparturesViewModel(app: Application) : AndroidViewModel(app) {
     val state: StateFlow<UiState> = _state.asStateFlow()
 
     private var loadJob: Job? = null
+
+    init {
+        // Load the station list off the main thread so the first search keystroke doesn't stall.
+        viewModelScope.launch(Dispatchers.IO) { Stations.all }
+    }
 
     /** Show departures from [crs], optionally only trains calling at [callingAt]. */
     fun show(crs: String, callingAt: String?) {

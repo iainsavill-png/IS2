@@ -80,9 +80,23 @@ class LdbwsParsingTest {
     }
 
     @Test
+    fun fullStationListLoads() {
+        assertTrue(Stations.all.size > 2500)
+        assertEquals(Stations.all.size, Stations.all.map { it.crs }.toSet().size)
+        assertEquals("Abbey Wood", Stations.nameFor("abw"))
+        assertEquals("Kilmarnock", Stations.nameFor("KMK"))
+    }
+
+    @Test
     fun stationSearch() {
         assertEquals("PAD", Stations.search("pad").first().crs)
         assertEquals("Reading", Stations.search("Read").first().name)
-        assertEquals("KGX", Stations.search("King").first().crs)
+        // Punctuation-insensitive, and matches on any word in the name.
+        assertEquals("KGX", Stations.search("king's cross").first().crs)
+        assertTrue(Stations.search("kings cross", limit = 10).any { it.crs == "KGX" })
+        assertTrue(Stations.search("waverley", limit = 10).any { it.crs == "EDB" })
+        // A 3-letter query that's a real code puts that station first, even if names also match.
+        assertEquals("ELY", Stations.search("ely").first().crs)
+        assertTrue(Stations.search("zzzzz").isEmpty())
     }
 }

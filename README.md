@@ -6,7 +6,7 @@ National Rail station in Great Britain, using National Rail's official
 
 ## Features
 
-- Search by station name or 3-letter CRS code (for example `RDG`, `PAD`, `KGX`)
+- Search all ~2,600 National Rail stations by name or 3-letter CRS code (for example `RDG`, `PAD`, `KGX`)
 - Optional "Calling at" filter, so you only see trains that stop at your destination
 - Scheduled time, expected time (on time, late, delayed or cancelled), platform, operator and coach count
 - Delay and cancellation reasons, plus station disruption messages
@@ -55,17 +55,21 @@ app/src/main/java/uk/railboard/app/
 ├── MainActivity.kt
 ├── data/
 │   ├── Ldbws.kt          # REST client and JSON models for GetDepartureBoard
-│   ├── Stations.kt       # built-in list of major stations for name search
+│   ├── Stations.kt       # station search over the bundled list
 │   └── Settings.kt       # API key, API URL and recent stations (SharedPreferences)
 └── ui/
     ├── DeparturesViewModel.kt
     ├── DeparturesScreen.kt   # Compose UI
     └── theme/Theme.kt
+app/src/main/resources/uk/railboard/app/data/stations.csv   # every GB station (CRS,Name)
 ```
+
+The station list comes from
+[davwheat/uk-railway-stations](https://github.com/davwheat/uk-railway-stations). To refresh it,
+regenerate `stations.csv` from that repo's `stations.json`.
 
 ## Ideas for next steps
 
-- Bundle the full station list (about 2,600 stations) for name search
 - Service details screen (`GetServiceDetails`) showing calling points
 - Arrivals board (`GetArrivalBoard`)
 - Home-screen widget for a favourite route
